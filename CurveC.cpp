@@ -1,73 +1,36 @@
 /*////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////
-
    _____                             
   / ____|                            
- | |        ___ _   _ _ ____   _____ 
- | |       / __| | | | '__\ \ / / _ \
- | |____  | (__| |_| | |   \ V /  __/
-  \_____|  \___|\__,_|_|    \_/ \___|
+ | |         ___ _   _ _ ____   _____ 
+ | |        / __| | | | '__\ \ / / _ \
+ | |____   | (__| |_| | |   \ V /  __/
+  \_____|   \___|\__,_|_|    \_/ \___|
                                     
-
 //////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////*/
+
+
 
 #include <stdio.h>
 #include <GL/glut.h>
 
-const double LINE_SIZE = 0.01;
+const double LINE_SIZE = 0.005;
+const int SCREEN_WIDTH = 640;
+const int SCREEN_HEIGHT = 640;
 
 void askForNumber(int &num){
   printf("Please, introduce the size of the C-curve: ");
   scanf("%d", &num);
 }
 
-void display(){
-  glClearColor(0.0f, 0.0f, 0.0f, 1.0f); // Background color to black
-  glClear(GL_COLOR_BUFFER_BIT);         
- 
-
+void glDrawLine(double fromX, double fromY, double toX, double toY){
+  printf("LINE: %f, %f - %f, %f\n", fromX, fromY, toX, toY);
   glBegin( GL_LINES);
-    glVertex3d( 0, 0, 0);
-    glVertex3d( 0.01, 0, 0);
-    glVertex3d( 0.01, 0, 0);
-    glVertex3d( 0.01, 0.01, 0);
-    glVertex3d( 0.01, 0.01, 0);
-    glVertex3d( 0.02, 0.01, 0);
+    glVertex3d( fromX, fromY, 0);
+    glVertex3d( toX, toY, 0);
   glEnd();
-
-
-
-
- 
-   glFlush();  
 }
-
-
-/*----------------------------------
-Surface to print the Curve
-----------------------------------*/
-struct Paper {
-  void wipePaper();
-  void printPaper();
-  void writeInPaper(char charToWrite, int x, int y);
-};
-
-//Removes all content from the paper
-void Paper::wipePaper(){
-
-}
-
-//Prints the paper's content
-void Paper::printPaper(){
-
-}
-
-//Writes charToWrite in the (x,y) position
-void Paper::writeInPaper(char charToWrite, int x, int y){
-  
-}
-
 
 /*----------------------------------
 Turtle to walk the paper
@@ -76,74 +39,92 @@ enum Direction{Right, Up, Left, Down};
 
 struct Turtle {
   void advance();
-  void setPosition(double x, double y);
+  void setPosition(double x, double y, Direction direction);
+  void turnClockwise();
+  void turnCounterclockwise();
 
   private:
     double turtleX, turtleY;
-    Direction direction;
+    Direction turtleDirection;
 };
 
 void Turtle::advance(){
-  switch (direction){
+  // printf("TURTLE DIRECTION: %d", turtleDirection);
+  switch (turtleDirection){
   case Right:
-    glBegin( GL_LINES);
-      glVertex3d( turtleX, turtleY, 0);
-      glVertex3d( turtleX + LINE_SIZE, turtleY, 0);
-    glEnd();
+    glDrawLine(turtleX, turtleY, turtleX + LINE_SIZE, turtleY);
     turtleX += LINE_SIZE;
     break;
   case Up:
-    glBegin( GL_LINES);
-      glVertex3d( turtleX, turtleY, 0);
-      glVertex3d( turtleX, turtleY + LINE_SIZE, 0);
-    glEnd();
+    glDrawLine(turtleX, turtleY, turtleX, turtleY + LINE_SIZE);
     turtleY += LINE_SIZE;
     break;
   case Left:
-    glBegin( GL_LINES);
-      glVertex3d( turtleX, turtleY, 0);
-      glVertex3d( turtleX - LINE_SIZE, turtleY, 0);
-    glEnd();
-    turtleX += LINE_SIZE;
+    glDrawLine(turtleX, turtleY, turtleX - LINE_SIZE, turtleY);
+    turtleX -= LINE_SIZE;
     break;
   case Down:
-    glBegin( GL_LINES);
-      glVertex3d( turtleX, turtleY, 0);
-      glVertex3d( turtleX, turtleY - LINE_SIZE, 0);
-    glEnd();
-    turtleY += LINE_SIZE;
+    glDrawLine(turtleX, turtleY, turtleX, turtleY - LINE_SIZE);
+    turtleY -= LINE_SIZE;
     break;
   }
 }
 
-void Turtle::setPosition(double x, double y){
+void Turtle::setPosition(double x, double y, Direction direction){
   turtleX = x;
   turtleY = y;
+  turtleDirection = direction;
+}
+
+void Turtle::turnClockwise(){
+  int newDirection = (turtleDirection - 1 + 4) % 4;
+  turtleDirection = Direction(newDirection);
+}
+
+void Turtle::turnCounterclockwise(){
+  int newDirection = (turtleDirection +1) % 4;
+  turtleDirection = Direction(newDirection);
 }
 
 
 /*----------------------------------
 C Curve main drawing method
 ----------------------------------*/
-void drawCurve(int curveSize){
+void drawCurve(int curveSize, Turtle &turtle){
   if(curveSize == 0){
-
+    turtle.advance();
+  }
+  else if(curveSize > 0){
+    drawCurve(curveSize - 1, turtle);
+    turtle.turnClockwise();
+    drawCurve(curveSize - 1, turtle);
+    turtle.turnCounterclockwise();
   }
 }
 
-int main(int argc, char** argv){
+
+/*----------------------------------
+OpenGL starting method
+----------------------------------*/
+void display(){
+  Turtle turtle;
+  turtle.setPosition(0, 0, Right);
   int curveSize = 0;
   askForNumber(curveSize);
 
-   glutInit(&argc, argv);                 // Initialize GLUT
-   glutCreateWindow("OpenGL Setup Test"); // Create a window with the given title
-   glutInitWindowSize(320, 320);   // Set the window's initial width & height
-   glutInitWindowPosition(50, 50); // Position the window's initial top-left corner
-   glutDisplayFunc(display); // Register display callback handler for window re-paint
-   glutMainLoop();           // Enter the infinitely event-processing loop
-   return 0;
+  glClearColor(0.0f, 0.0f, 0.0f, 1.0f); // Background color to black
+  glClear(GL_COLOR_BUFFER_BIT);         
 
+  drawCurve(curveSize, turtle);
+  glFlush();  
+}
 
+int main(int argc, char** argv){
+  glutInit(&argc, argv);                 // Initialize GLUT
+  glutCreateWindow("Levy's C-Curve"); // Create a window with the given title
+  glutReshapeWindow(1600, 1000);
+  glutDisplayFunc(display); // Register display callback handler for window re-paint
+  glutMainLoop();           // Enter the infinitely event-processing loop
 
-  // return 0;
+  return 0;
 }
