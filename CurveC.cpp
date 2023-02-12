@@ -47,7 +47,6 @@ struct Turtle {
 };
 
 void Turtle::advance(){
-  // printf("TURTLE DIRECTION: %d", turtleDirection);
   switch (turtleDirection){
   case Right:
     glDrawLine(turtleX, turtleY, turtleX + LINE_SIZE, turtleY);
