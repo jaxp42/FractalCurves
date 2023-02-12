@@ -15,9 +15,7 @@
 #include <stdio.h>
 #include <GL/glut.h>
 
-const double LINE_SIZE = 0.005;
-const int SCREEN_WIDTH = 640;
-const int SCREEN_HEIGHT = 640;
+const double LINE_SIZE = 0.01;
 
 void askForNumber(int &num){
   printf("Please, introduce the size of the C-curve: ");
@@ -33,7 +31,7 @@ void glDrawLine(double fromX, double fromY, double toX, double toY){
 }
 
 /*----------------------------------
-Turtle to walk the paper
+Turtle to control the position
 ----------------------------------*/
 enum Direction{Right, Up, Left, Down};
 
@@ -112,19 +110,20 @@ void display(){
   int curveSize = 0;
   askForNumber(curveSize);
 
-  glClearColor(0.0f, 0.0f, 0.0f, 1.0f); // Background color to black
+  glClearColor(0.0f, 0.0f, 0.0f, 1.0f); 
   glClear(GL_COLOR_BUFFER_BIT);         
 
   drawCurve(curveSize, turtle);
   glFlush();  
 }
 
+
 int main(int argc, char** argv){
-  glutInit(&argc, argv);                 // Initialize GLUT
-  glutCreateWindow("Levy's C-Curve"); // Create a window with the given title
+  glutInit(&argc, argv);              
+  glutCreateWindow("Levy's C-Curve"); 
   glutReshapeWindow(1600, 1000);
-  glutDisplayFunc(display); // Register display callback handler for window re-paint
-  glutMainLoop();           // Enter the infinitely event-processing loop
+  glutDisplayFunc(display); 
+  glutMainLoop();           
 
   return 0;
 }
