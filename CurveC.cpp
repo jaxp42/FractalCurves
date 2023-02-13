@@ -15,7 +15,7 @@
 #include <stdio.h>
 #include <GL/glut.h>
 
-const double LINE_SIZE = 0.0005;
+const double LINE_SIZE = 0.01;
 int curveSize = 0;
 
 void askForNumber(int &num){
@@ -24,7 +24,7 @@ void askForNumber(int &num){
 }
 
 void glDrawLine(double fromX, double fromY, double toX, double toY){
-  printf("LINE: %f, %f - %f, %f\n", fromX, fromY, toX, toY);
+  //printf("LINE: %f, %f -> %f, %f\n", fromX, fromY, toX, toY);
   glBegin( GL_LINES);
     glVertex3d( fromX, fromY, 0);
     glVertex3d( toX, toY, 0);
