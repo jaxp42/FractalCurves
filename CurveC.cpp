@@ -15,7 +15,8 @@
 #include <stdio.h>
 #include <GL/glut.h>
 
-const double LINE_SIZE = 0.01;
+const double LINE_SIZE = 0.0005;
+int curveSize = 0;
 
 void askForNumber(int &num){
   printf("Please, introduce the size of the C-curve: ");
@@ -106,9 +107,7 @@ OpenGL starting method
 void display(){
   Turtle turtle;
   turtle.setPosition(0, 0, Right);
-  int curveSize = 0;
-  askForNumber(curveSize);
-
+  
   glClearColor(0.0f, 0.0f, 0.0f, 1.0f); 
   glClear(GL_COLOR_BUFFER_BIT);         
 
@@ -118,9 +117,11 @@ void display(){
 
 
 int main(int argc, char** argv){
+  askForNumber(curveSize);
+
   glutInit(&argc, argv);              
   glutCreateWindow("Levy's C-Curve"); 
-  glutReshapeWindow(1600, 1000);
+  glutReshapeWindow(1000, 1000);
   glutDisplayFunc(display); 
   glutMainLoop();           
 
